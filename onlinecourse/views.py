@@ -155,6 +155,7 @@ def show_exam_result(request, course_id, submission_id):
     submission = get_object_or_404(Submission, pk=submission_id)
 
     selected_ids = submission.choices.values_list('id', flat=True)
+    # selected_ids = submission.choices.filter(id__in=selected_ids)
     total_score = 0
     for lesson in course.lesson_set.all():
         for question in lesson.question_set.all():
