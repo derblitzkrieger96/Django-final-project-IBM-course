@@ -157,17 +157,22 @@ def show_exam_result(request, course_id, submission_id):
     selected_ids = submission.choices.values_list('id', flat=True)
     # selected_ids = submission.choices.filter(id__in=selected_ids)
     total_score = 0
+    total_questions = 0
+
     for lesson in course.lesson_set.all():
         for question in lesson.question_set.all():
             correct_choices = question.choice_set.filter(is_correct=True)
             selected_choices = submission.choices.filter(question=question)
-            if set(selected_choices) == set(correct_choices):
-                total_score += question.grade
+            if (question.is_get_score(selected_choices) and len(correct_choices)==len(selected_choices)):
+                total_score += 1
+            total_questions += 1
+            
     
+
     context['user'] = request.user
     context['course'] = course
-    context['selected_ids'] = selected_ids
-    context['grade'] = total_score
+    context['selected_ids'] = list(selected_ids)
+    context['grade'] = int((total_score/total_questions)*100)
 
     return render(request, 'onlinecourse/exam_result_bootstrap.html', context)
 
